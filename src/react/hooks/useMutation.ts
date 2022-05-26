@@ -28,6 +28,7 @@ export function useMutation<
   mutation: DocumentNode | TypedDocumentNode<TData, TVariables>,
   options?: MutationHookOptions<TData, TVariables, TContext>,
 ): MutationTuple<TData, TVariables, TContext, TCache> {
+  console.log('[@apollo/client]: useMutation => init');
   const client = useApolloClient(options?.client);
   verifyDocumentType(mutation, DocumentType.Mutation);
   const [result, setResult] = useState<Omit<MutationResult, 'reset'>>({
@@ -59,6 +60,8 @@ export function useMutation<
       TCache
     > = {}
   ) => {
+    console.log('[@apollo/client]: useMutation => execute fn (executeOptions)', executeOptions);
+    console.log('[@apollo/client]: useMutation => execute fn (ref.current)', ref.current);
     const {client, options, mutation} = ref.current;
     const baseOptions = { ...options, mutation };
     if (!ref.current.result.loading && !baseOptions.ignoreResults) {
@@ -83,7 +86,8 @@ export function useMutation<
         errors && errors.length > 0
           ? new ApolloError({ graphQLErrors: errors })
           : void 0;
-
+      console.log('[@apollo/client]: useMutation => client.mutate (mutationId)', mutationId);
+      console.log('[@apollo/client]: useMutation => client.mutate (ref.current.mutationId)', ref.current.mutationId);
       if (
         mutationId === ref.current.mutationId &&
         !clientOptions.ignoreResults
@@ -105,6 +109,7 @@ export function useMutation<
       executeOptions.onCompleted?.(response.data!);
       return response;
     }).catch((error) => {
+      console.log('[@apollo/client]: useMutation => error', error);
       if (
         mutationId === ref.current.mutationId &&
         ref.current.isMounted
